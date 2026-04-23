@@ -1,0 +1,36 @@
+# IDE Files
+.idea/
+.metadata/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+.factorypath
+
+# Build Artifacts
+**/target/
+**/bin/
+**/out/
+**/dist/
+**/build/
+
+# Node.js
+**/node_modules/
+package-lock.json
+
+# Logs
+*.log
+logs/
+hs_err_pid*
+
+# Binaries
+*.zip
+*.jar
+*.war
+*.ear
+
+# System Files
+Thumbs.db
+.DS_Store
