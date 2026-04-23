@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+    https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        PARENT POM
+        Spring Boot's parent manages ALL dependency versions.
+        You never worry about "does library X work with 
+        Spring Boot Y?" — parent handles compatibility.
+        
+        Think of it like: parent is the experienced senior 
+        developer who already knows which versions work 
+        together. You just say what you need, they 
+        pick the right version.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.4</version>
+        <relativePath/>
+    </parent>
+
+    <!--
+        YOUR PROJECT COORDINATES
+        groupId    = organisation/company identifier
+                     (reverse domain: com.booknest)
+        artifactId = this specific module name
+        version    = SNAPSHOT means "still in development"
+                     Remove SNAPSHOT for final releases
+    -->
+    <groupId>com.booknest</groupId>
+    <artifactId>eureka-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>eureka-server</name>
+    <description>Service Registry for BookNest Platform</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <!--
+            Spring Cloud version MUST match Spring Boot version.
+            Boot 3.2.x → Cloud 2023.0.x
+            If these don't match → startup errors.
+            Never change one without changing the other.
+        -->
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
+    </properties>
+
+    <dependencies>
+
+        <!--
+            EUREKA SERVER
+            This ONE dependency gives you:
+            - A web dashboard at http://localhost:8761
+            - REST endpoints that services call to register
+            - Heartbeat monitoring (removes dead services)
+            - Service registry that gateway queries
+            
+            The @EnableEurekaServer annotation in your 
+            main class activates all of this.
+        -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+        </dependency>
+
+        <!--
+            SPRING BOOT ACTUATOR (optional but useful)
+            Gives you health check endpoint:
+            GET /actuator/health → { "status": "UP" }
+            Docker and Kubernetes use this to know 
+            if your service is alive.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!--
+            TEST — keep this always.
+            JUnit 5 testing support.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!--
+        DEPENDENCY MANAGEMENT
+        Controls ALL Spring Cloud library versions as a set.
+        
+        NEVER add version numbers to spring-cloud 
+        dependencies individually above.
+        This block manages them together.
+        
+        ${spring-cloud.version} references what we defined 
+        in <properties> above.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!--
+                SPRING BOOT MAVEN PLUGIN
+                Lets you:
+                - Run app: mvn spring-boot:run
+                - Build executable jar: mvn package
+                  (creates a fat jar with all dependencies)
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
