@@ -14,9 +14,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.springframework.context.annotation.Profile;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Profile("!test")
 public class DataFixer implements CommandLineRunner {
 
     private final BookRepository bookRepository;

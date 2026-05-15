@@ -67,50 +67,65 @@ public class BookController {
     // Admin: Add a new book to catalog
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<BookResponse> addBook(@Valid @RequestBody BookRequest request) {
+    public ResponseEntity<BookResponse> addBook(
+            @Valid @RequestBody BookRequest request,
+            @RequestHeader(value = "X-User-Role", required = false) String role) {
         log.info("Adding new book: {}", request.getTitle());
-        return ResponseEntity.status(201).body(bookService.addBook(request, "ADMIN"));
+        return ResponseEntity.status(201).body(bookService.addBook(request, role));
     }
 
     // Admin: Update book details
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{bookId}")
-    public ResponseEntity<BookResponse> updateBook(@PathVariable Long bookId, @Valid @RequestBody BookRequest request) {
+    public ResponseEntity<BookResponse> updateBook(
+            @PathVariable Long bookId,
+            @Valid @RequestBody BookRequest request,
+            @RequestHeader(value = "X-User-Role", required = false) String role) {
         log.info("Updating book with ID: {}", bookId);
-        return ResponseEntity.ok(bookService.updateBook(bookId, request, "ADMIN"));
+        return ResponseEntity.ok(bookService.updateBook(bookId, request, role));
     }
 
     // Admin: Soft delete a book
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
+    public ResponseEntity<Void> deleteBook(
+            @PathVariable Long bookId,
+            @RequestHeader(value = "X-User-Role", required = false) String role) {
         log.info("Deleting book with ID: {}", bookId);
-        bookService.deleteBook(bookId, "ADMIN");
+        bookService.deleteBook(bookId, role);
         return ResponseEntity.noContent().build();
     }
 
     // Admin: Update book stock level
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{bookId}/stock")
-    public ResponseEntity<BookResponse> updateStock(@PathVariable Long bookId, @RequestParam Integer quantity) {
+    public ResponseEntity<BookResponse> updateStock(
+            @PathVariable Long bookId,
+            @RequestParam Integer quantity,
+            @RequestHeader(value = "X-User-Role", required = false) String role) {
         log.info("Updating stock for book: {} by {}", bookId, quantity);
-        return ResponseEntity.ok(bookService.updateStock(bookId, quantity, "ADMIN"));
+        return ResponseEntity.ok(bookService.updateStock(bookId, quantity, role));
     }
 
     // Admin: Toggle book featured status
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{bookId}/featured")
-    public ResponseEntity<BookResponse> toggleFeatured(@PathVariable Long bookId) {
+    public ResponseEntity<BookResponse> toggleFeatured(
+            @PathVariable Long bookId,
+            @RequestHeader(value = "X-User-Role", required = false) String role) {
         log.info("Toggling featured status for book: {}", bookId);
-        return ResponseEntity.ok(bookService.toggleFeatured(bookId, "ADMIN"));
+        return ResponseEntity.ok(bookService.toggleFeatured(bookId, role));
     }
 
     // Admin: Upload or update book cover image via simplified path
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload-image/{bookId}")
-    public ResponseEntity<BookResponse> uploadCover(@PathVariable Long bookId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<BookResponse> uploadCover(
+            @PathVariable Long bookId,
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader(value = "X-User-Role", required = false) String role) {
         log.info("Dedicated image upload for book: {}", bookId);
-        return ResponseEntity.ok(bookService.uploadCoverImage(bookId, file, "ADMIN"));
+        return ResponseEntity.ok(bookService.uploadCoverImage(bookId, file, role));
     }
 
     // Service: Internal stock level check

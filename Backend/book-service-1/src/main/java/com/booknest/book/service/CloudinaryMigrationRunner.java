@@ -23,9 +23,12 @@ import java.util.List;
  *
  * Once all old images are migrated, this script becomes a fast no-op.
  */
+import org.springframework.context.annotation.Profile;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Profile("!test")
 public class CloudinaryMigrationRunner implements CommandLineRunner {
 
     private final BookRepository bookRepository;

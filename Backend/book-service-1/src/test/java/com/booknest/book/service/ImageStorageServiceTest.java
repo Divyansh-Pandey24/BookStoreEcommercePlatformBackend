@@ -1,33 +1,40 @@
 package com.booknest.book.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Uploader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ImageStorageServiceTest {
 
+    @Mock
+    private Cloudinary cloudinary;
+
+    @Mock
+    private Uploader uploader;
+
     @InjectMocks
     private ImageStorageService imageStorageService;
 
-    @TempDir
-    Path tempDir;
-
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(imageStorageService, "uploadDir", tempDir.toString());
+        // Mock the uploader call which is chain-called in the service
+        lenient().when(cloudinary.uploader()).thenReturn(uploader);
     }
 
     @Test
@@ -39,10 +46,13 @@ class ImageStorageServiceTest {
                 "dummy image content".getBytes()
         );
 
+        Map<String, Object> uploadResult = Map.of("secure_url", "https://cloudinary.com/booknest/covers/test.jpg");
+        when(uploader.upload(any(byte[].class), anyMap())).thenReturn(uploadResult);
+
         String savedPath = imageStorageService.saveImage(mockFile);
 
-        assertThat(savedPath).startsWith("uploads/books/");
-        assertThat(savedPath).endsWith("test-cover.jpg");
+        assertThat(savedPath).isEqualTo("https://cloudinary.com/booknest/covers/test.jpg");
+        verify(uploader).upload(any(byte[].class), anyMap());
     }
 
     @Test
@@ -87,18 +97,18 @@ class ImageStorageServiceTest {
 
     @Test
     void deleteImage_validPath_deletesFile() throws IOException {
-        Path mockFile = tempDir.resolve("test_image.jpg");
-        Files.write(mockFile, "Test image content".getBytes());
+        String cloudinaryUrl = "https://res.cloudinary.com/demo/image/upload/v1/booknest/covers/test.webp";
+        
+        imageStorageService.deleteImage(cloudinaryUrl);
 
-        imageStorageService.deleteImage(mockFile.toString());
-
-        assertThat(Files.exists(mockFile)).isFalse();
+        verify(uploader).destroy(eq("booknest/covers/test"), anyMap());
     }
 
     @Test
-    void deleteImage_nullOrEmptyPath_doesNothing() {
-        // Will not throw any exception
+    void deleteImage_nullOrEmptyPath_doesNothing() throws IOException {
         imageStorageService.deleteImage(null);
         imageStorageService.deleteImage("");
+        
+        verify(uploader, never()).destroy(anyString(), anyMap());
     }
 }

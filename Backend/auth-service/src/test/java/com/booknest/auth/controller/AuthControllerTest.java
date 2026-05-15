@@ -101,7 +101,7 @@ class AuthControllerTest {
     void register_invalidInput_fails() throws Exception {
         RegisterRequest req = new RegisterRequest();
         req.setEmail("invalid-email"); // Invalid email format
-        req.setPassword("short"); // Too short
+        req.setPassword("password"); // Valid length but missing number
         // fullName missing
 
         mockMvc.perform(post("/auth/register")
