@@ -110,7 +110,7 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fullName").value("Full name is required"))
                 .andExpect(jsonPath("$.email").value("Please provide a valid email"))
-                .andExpect(jsonPath("$.password").value("Password must be at least 8 characters"));
+                .andExpect(jsonPath("$.password").value("Password must contain at least one letter and one number"));
     }
 
     // ─────────────────────────── LOGIN ───────────────────────────
