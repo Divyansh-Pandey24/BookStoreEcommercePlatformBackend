@@ -102,8 +102,8 @@ jobs:
             # Add Swap file if not present (prevents OOM during build on small EC2s)
             cd ~/booknest-app
             if [ ! -f "/swapfile" ]; then
-              echo "Creating 2G swap file..."
-              sudo fallocate -l 2G /swapfile
+              echo "Creating 4G swap file..."
+              sudo fallocate -l 4G /swapfile
               sudo chmod 600 /swapfile
               sudo mkswap /swapfile
               sudo swapon /swapfile
@@ -140,7 +140,9 @@ jobs:
             echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> .env
             echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
             echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
+            echo "RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}" >> .env
+            echo "RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }}" >> .env
             
             mvn clean package -DskipTests
-            sudo docker compose down
-            sudo docker compose up -d --build
+            sudo docker compose -f docker-compose.prod.yml down
+            sudo docker compose -f docker-compose.prod.yml up -d --build
