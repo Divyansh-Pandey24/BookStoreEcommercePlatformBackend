@@ -277,11 +277,12 @@ public class BookService {
         }
         try {
             List<BookDocument> docs = bookSearchRepository.fuzzySearch(keyword);
-            if (!docs.isEmpty()) {
+            if (docs != null && !docs.isEmpty()) {
                 return docs.stream().map(this::convertDocToResponse).collect(Collectors.toList());
             }
+            log.info("Elasticsearch index empty for keyword '{}', falling back to MySQL", keyword);
         } catch (Exception e) {
-            log.warn("Elasticsearch search failed, falling back to MySQL: {}", e.getMessage());
+            log.warn("Elasticsearch search failed for '{}', falling back to MySQL: {}", keyword, e.getMessage());
         }
         return bookRepository.searchBooks(keyword).stream()
             .map(this::convertToResponse)
@@ -293,11 +294,12 @@ public class BookService {
         log.info("Fetching books by genre: {}", genre);
         try {
             List<BookDocument> docs = bookSearchRepository.findByGenreAndActiveTrue(genre);
-            if (!docs.isEmpty()) {
+            if (docs != null && !docs.isEmpty()) {
                 return docs.stream().map(this::convertDocToResponse).collect(Collectors.toList());
             }
+            log.info("Elasticsearch index empty for genre '{}', falling back to MySQL", genre);
         } catch (Exception e) {
-            log.warn("Elasticsearch not available for genre filter");
+            log.warn("Elasticsearch not available for genre '{}', falling back to MySQL", genre);
         }
         return bookRepository.findByGenreIgnoreCaseAndActiveTrue(genre).stream()
             .map(this::convertToResponse)
@@ -310,11 +312,12 @@ public class BookService {
         log.info("Fetching featured books");
         try {
             List<BookDocument> docs = bookSearchRepository.findByFeaturedTrueAndActiveTrue();
-            if (!docs.isEmpty()) {
+            if (docs != null && !docs.isEmpty()) {
                 return docs.stream().map(this::convertDocToResponse).collect(Collectors.toList());
             }
+            log.info("Elasticsearch index is empty for featured books, falling back to MySQL");
         } catch (Exception e) {
-            log.warn("Elasticsearch not available for featured books");
+            log.warn("Elasticsearch not available for featured books, falling back to MySQL: {}", e.getMessage());
         }
         return bookRepository.findByFeaturedTrueAndActiveTrue().stream()
             .map(this::convertToResponse)
