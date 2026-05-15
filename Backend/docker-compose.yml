@@ -228,8 +228,8 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SPRING_BOOT_ADMIN_CLIENT_URL=http://admin-server:9090
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - EMAIL_USERNAME=divyanshpandey996@gmail.com
-      - EMAIL_PASSWORD=caqmwiwetzuujnew
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_notification?useSSL=false&allowPublicKeyRetrieval=true
 
     depends_on:
