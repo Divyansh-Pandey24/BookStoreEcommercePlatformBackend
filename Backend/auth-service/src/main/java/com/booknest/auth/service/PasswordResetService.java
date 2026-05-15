@@ -30,6 +30,9 @@ public class PasswordResetService {
         User user = userAuthRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Delete any existing tokens for this user to avoid unique constraint violation
+        tokenRepo.deleteByUserAuthEntity(user);
+
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(token);
@@ -37,7 +40,8 @@ public class PasswordResetService {
         resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(15));
         tokenRepo.save(resetToken);
 
-        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+        // Build dynamic link (replaces localhost)
+        String resetLink = "http://65.2.12.184/reset-password?token=" + token;
         sendEmail(user.getEmail(), resetLink);
         return "Reset link sent successfully";
     }
