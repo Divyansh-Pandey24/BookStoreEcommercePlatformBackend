@@ -110,6 +110,9 @@ jobs:
               echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
             fi
 
+            # Ensure Virtual Memory settings for Elasticsearch
+            sudo sysctl -w vm.max_map_count=262144
+
             # Ensure Java, Maven, Docker and Docker Compose are installed
             cd ~/booknest-app
             if ! command -v java &> /dev/null || ! command -v mvn &> /dev/null || ! command -v docker &> /dev/null; then
