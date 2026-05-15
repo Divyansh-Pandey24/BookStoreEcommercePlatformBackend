@@ -85,20 +85,21 @@ jobs:
             if [ ! -d "booknest-backend" ]; then
               git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatformBackend.git booknest-backend
             fi
-            cd booknest-backend
+            cd ~/booknest-app/booknest-backend
             git checkout main
             git pull https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatformBackend.git main
 
             # Clone or Pull Frontend
+            cd ~/booknest-app
             if [ ! -d "booknest-frontend" ]; then
               git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatform-Frontend.git booknest-frontend
             else
               cd booknest-frontend
               git pull https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatform-Frontend.git main
-              cd ..
             fi
 
             # Add Swap file if not present (prevents OOM during build on small EC2s)
+            cd ~/booknest-app
             if [ ! -f "/swapfile" ]; then
               echo "Creating 2G swap file..."
               sudo fallocate -l 2G /swapfile
@@ -109,6 +110,7 @@ jobs:
             fi
 
             # Ensure Java, Maven, Docker and Docker Compose are installed
+            cd ~/booknest-app
             if ! command -v java &> /dev/null || ! command -v mvn &> /dev/null || ! command -v docker &> /dev/null; then
               echo "Installing dependencies..."
               sudo apt-get update
@@ -125,6 +127,6 @@ jobs:
             fi
 
             # Build and restart all containers
-            cd booknest-backend/Backend
+            cd ~/booknest-app/booknest-backend/Backend
             mvn clean package -DskipTests
             sudo docker compose up -d --build
