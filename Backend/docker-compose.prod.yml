@@ -83,8 +83,8 @@ services:
     container_name: api-gateway
     ports:
       - "8080:8080"
+      - "81:8080"
       - "8000:8080"
-      - "8888:8080"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - JAVA_OPTS=-Xms128m -Xmx256m
@@ -120,6 +120,7 @@ services:
       - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - APP_UPLOAD_DIR=/app/uploads/books
       - JAVA_OPTS=-Xms128m -Xmx256m
     volumes:
       - book-images:/app/uploads
