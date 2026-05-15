@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+target/
+.mvn/
+*.log
+
+# Heavy Infrastructure (Local only)
+elasticsearch-*/
+kafka/
+sonarqube-*/
+
+# Sub-projects handled elsewhere
+final_frontend/
+final_frontend.zip
+
+# IDEs
+.idea/
+.vscode/
+.metadata/
+.project
+.settings/
+.classpath
+.factorypath
