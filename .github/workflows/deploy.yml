@@ -129,5 +129,14 @@ jobs:
 
             # Build and restart all containers
             cd ~/booknest-app/booknest-backend/Backend
+            
+            # Create/Update .env file from GitHub Secrets
+            echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}" > .env
+            echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> .env
+            echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> .env
+            echo "EMAIL_USERNAME=${{ secrets.EMAIL_USERNAME }}" >> .env
+            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
+            echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
+            
             mvn clean package -DskipTests
             sudo docker compose up -d --build
