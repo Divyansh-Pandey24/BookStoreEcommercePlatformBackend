@@ -125,11 +125,11 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_auth?useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_REDIS_HOST=redis-stack
       - MANAGEMENT_HEALTH_MAIL_ENABLED=false
-      - EMAIL_USERNAME=${EMAIL_USERNAME}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
 
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-dummy}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-dummy}
     depends_on:
       mysql:
         condition: service_healthy
@@ -228,8 +228,8 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SPRING_BOOT_ADMIN_CLIENT_URL=http://admin-server:9090
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - EMAIL_USERNAME=${EMAIL_USERNAME}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_notification?useSSL=false&allowPublicKeyRetrieval=true
 
     depends_on:

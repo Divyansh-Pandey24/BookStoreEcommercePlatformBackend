@@ -96,8 +96,8 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_auth
       - SPRING_REDIS_HOST=redis-stack
-      - EMAIL_USERNAME=${EMAIL_USERNAME}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
     depends_on:
       - mysql
       - eureka-server
@@ -166,8 +166,8 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - EMAIL_USERNAME=${EMAIL_USERNAME}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_notification
     depends_on:
       - mysql
