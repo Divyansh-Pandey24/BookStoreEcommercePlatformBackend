@@ -26,7 +26,10 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                dir('final_frontend/final_frontend') {
+                // Automatically clone the frontend repo into a local folder
+                sh 'rm -rf frontend-build'
+                sh 'git clone https://github.com/Divyansh-Pandey24/BookStoreEcommercePlatform-Frontend.git frontend-build'
+                dir('frontend-build') {
                     sh 'npm install'
                     sh 'npm run build'
                 }
@@ -39,7 +42,7 @@ pipeline {
                     // Login to ECR
                     sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
 
-                    def services = [
+                    def backendServices = [
                         'api-gateway': 'Backend/api-gateway',
                         'eureka-server': 'Backend/eureka-server',
                         'auth-service': 'Backend/auth-service',
@@ -49,17 +52,23 @@ pipeline {
                         'wallet-service': 'Backend/wallet-service',
                         'notification-service': 'Backend/notification-service',
                         'review-service': 'Backend/review-service',
-                        'admin-server': 'Backend/admin-server',
-                        'frontend': 'final_frontend/final_frontend'
+                        'admin-server': 'Backend/admin-server'
                     ]
 
-                    services.each { name, path ->
+                    backendServices.each { name, path ->
                         echo "Building and Pushing ${name}..."
                         sh "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-${name}:${IMAGE_TAG} ${path}"
                         sh "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-${name}:${IMAGE_TAG}"
                         sh "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-${name}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-${name}:latest"
                         sh "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-${name}:latest"
                     }
+
+                    // Build and Push Frontend
+                    echo "Building and Pushing frontend..."
+                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-frontend:${IMAGE_TAG} frontend-build"
+                    sh "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-frontend:${IMAGE_TAG}"
+                    sh "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-frontend:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-frontend:latest"
+                    sh "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME_PREFIX}-frontend:latest"
                 }
             }
         }
