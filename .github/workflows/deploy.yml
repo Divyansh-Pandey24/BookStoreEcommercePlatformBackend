@@ -146,4 +146,9 @@ jobs:
             
             mvn clean package -DskipTests
             sudo docker compose -f docker-compose.prod.yml down
+            sudo docker system prune -f
             sudo docker compose -f docker-compose.prod.yml up -d --build
+            
+            echo "Waiting for Gateway to initialize..."
+            sleep 20
+            sudo docker logs api-gateway --tail 50
