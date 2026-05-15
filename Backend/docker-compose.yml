@@ -266,6 +266,13 @@ services:
       eureka-server:
         condition: service_healthy
 
+  frontend:
+    build: ../../booknest-frontend
+    container_name: booknest-frontend
+    ports:
+      - "80:80"
+    restart: always
+
 volumes:
   mysql-data:
   redis-data:
