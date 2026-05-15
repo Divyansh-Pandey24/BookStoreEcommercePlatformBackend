@@ -23,16 +23,35 @@ import org.springframework.context.annotation.Profile;
 public class DataFixer implements CommandLineRunner {
 
     private final BookRepository bookRepository;
+    private final com.booknest.book.service.BookService bookService;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("Starting DataFixer to repair book cover images...");
+        log.info("Starting DataFixer to repair book records and sync search index...");
         
         fixFileNameTypos();
         repairNullUrls();
+        
+        // Ensure all books are active and sync them to Elasticsearch
+        try {
+            log.info("Ensuring all books are active...");
+            List<com.booknest.book.entity.Book> all = bookRepository.findAll();
+            for (com.booknest.book.entity.Book b : all) {
+                b.setActive(true);
+                // If none are featured, mark first few as featured
+                if (b.getBookId() <= 8) b.setFeatured(true);
+            }
+            bookRepository.saveAll(all);
+
+            log.info("Triggering automatic Elasticsearch synchronization...");
+            bookService.syncAllBooksToElasticsearch("ADMIN");
+            log.info("Sync complete.");
+        } catch (Exception e) {
+            log.error("Failed to sync search index on startup: {}", e.getMessage());
+        }
         
         log.info("DataFixer completion.");
     }
