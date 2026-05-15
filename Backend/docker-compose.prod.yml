@@ -14,6 +14,8 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
+    networks:
+      - booknest-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-1234}"]
@@ -26,6 +28,8 @@ services:
     container_name: booknest-redis
     volumes:
       - redis-data:/data
+    networks:
+      - booknest-network
     restart: unless-stopped
 
   zookeeper:
@@ -34,6 +38,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - booknest-network
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -47,6 +53,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - booknest-network
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
@@ -57,6 +65,8 @@ services:
       - ES_JAVA_OPTS=-Xms256m -Xmx384m
     volumes:
       - es-data:/usr/share/elasticsearch/data
+    networks:
+      - booknest-network
     restart: unless-stopped
 
   # ============================================================
@@ -76,6 +86,8 @@ services:
       timeout: 10s
       retries: 10
       start_period: 40s
+    networks:
+      - booknest-network
     restart: always
 
   api-gateway:
@@ -91,6 +103,8 @@ services:
       - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - eureka-server
+    networks:
+      - booknest-network
     restart: always
 
   auth-service:
@@ -107,6 +121,8 @@ services:
     depends_on:
       - mysql
       - eureka-server
+    networks:
+      - booknest-network
     restart: always
 
   book-service:
@@ -128,6 +144,8 @@ services:
     depends_on:
       - mysql
       - eureka-server
+    networks:
+      - booknest-network
     restart: always
 
   order-service:
@@ -142,6 +160,8 @@ services:
     depends_on:
       - mysql
       - kafka
+    networks:
+      - booknest-network
     restart: always
 
   cart-service:
@@ -155,6 +175,8 @@ services:
     depends_on:
       - mysql
       - eureka-server
+    networks:
+      - booknest-network
     restart: always
 
   wallet-service:
@@ -171,6 +193,8 @@ services:
     depends_on:
       - mysql
       - kafka
+    networks:
+      - booknest-network
     restart: always
 
   notification-service:
@@ -187,6 +211,8 @@ services:
     depends_on:
       - mysql
       - kafka
+    networks:
+      - booknest-network
     restart: always
 
   review-service:
@@ -200,6 +226,8 @@ services:
     depends_on:
       - mysql
       - eureka-server
+    networks:
+      - booknest-network
     restart: always
 
   admin-server:
@@ -211,6 +239,8 @@ services:
     depends_on:
       eureka-server:
         condition: service_started
+    networks:
+      - booknest-network
     restart: always
 
   frontend:
@@ -219,7 +249,15 @@ services:
     container_name: booknest-frontend
     ports:
       - "80:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - booknest-network
     restart: always
+
+networks:
+  booknest-network:
+    driver: bridge
 
 volumes:
   mysql-data:
