@@ -3,6 +3,8 @@ node_modules/
 target/
 .mvn/
 *.log
+.env
+
 
 # Heavy Infrastructure (Local only)
 elasticsearch-*/
