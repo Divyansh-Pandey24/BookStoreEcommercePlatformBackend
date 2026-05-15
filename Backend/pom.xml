@@ -55,6 +55,7 @@
         -->
         <sonar.projectKey>booknest-backend</sonar.projectKey>
         <sonar.projectName>BookNest Backend</sonar.projectName>
+        <sonar.organization>divyansh-pandey24</sonar.organization>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.coverage.jacoco.xmlReportPaths>
