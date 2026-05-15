@@ -89,10 +89,13 @@ jobs:
             git checkout main
             git pull https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatformBackend.git main
 
-            # Clone Frontend if not present
-            cd ..
+            # Clone or Pull Frontend
             if [ ! -d "booknest-frontend" ]; then
               git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatform-Frontend.git booknest-frontend
+            else
+              cd booknest-frontend
+              git pull https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatform-Frontend.git main
+              cd ..
             fi
 
             # Add Swap file if not present (prevents OOM during build on small EC2s)
