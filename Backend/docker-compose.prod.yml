@@ -65,6 +65,8 @@ services:
     build: ./eureka-server
     image: booknest-eureka-server:latest
     container_name: eureka-server
+    environment:
+      - JAVA_OPTS=-Xms128m -Xmx256m
     restart: always
 
   api-gateway:
@@ -75,6 +77,7 @@ services:
       - "8080:8080"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       eureka-server:
         condition: service_started
@@ -90,6 +93,7 @@ services:
       - SPRING_REDIS_HOST=redis-stack
       - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
       - eureka-server
@@ -107,6 +111,7 @@ services:
       - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
       - eureka-server
@@ -120,6 +125,7 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_order
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
       - kafka
@@ -132,6 +138,7 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_cart
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
       - eureka-server
@@ -147,6 +154,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_wallet
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
       - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
       - kafka
@@ -162,6 +170,7 @@ services:
       - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_notification
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
       - kafka
@@ -174,6 +183,7 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_review
+      - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
       - eureka-server
