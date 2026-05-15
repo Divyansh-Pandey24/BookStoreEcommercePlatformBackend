@@ -1,10 +1,7 @@
-# Final Production Deploy - Port 80 Unified (Clean URL Fix)
+# Final Production Deploy - Unified Network (Architecture Fix)
 version: "3.8"
 
 services:
-  # ============================================================
-  # INFRASTRUCTURE (Unchanged, using standard images)
-  # ============================================================
   mysql:
     image: mysql:8.0
     container_name: booknest-mysql
@@ -48,8 +45,8 @@ services:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ZOOKEEPER_CONNECT: booknest-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://booknest-kafka:9092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -69,9 +66,6 @@ services:
       - booknest-network
     restart: unless-stopped
 
-  # ============================================================
-  # MICROSERVICES (Internal - No public ports)
-  # ============================================================
   eureka-server:
     build: ./eureka-server
     image: booknest-eureka-server:latest
@@ -96,8 +90,6 @@ services:
     container_name: api-gateway
     ports:
       - "8080:8080"
-      - "81:8080"
-      - "8000:8080"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - JAVA_OPTS=-Xms128m -Xmx256m
@@ -113,8 +105,8 @@ services:
     container_name: auth-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_auth
-      - SPRING_REDIS_HOST=redis-stack
+      - SPRING_DATASOURCE_URL=jdbc:mysql://booknest-mysql:3306/booknest_auth
+      - SPRING_REDIS_HOST=booknest-redis
       - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
       - JAVA_OPTS=-Xms128m -Xmx256m
@@ -131,9 +123,9 @@ services:
     container_name: book-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_book
-      - SPRING_REDIS_HOST=redis-stack
-      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - SPRING_DATASOURCE_URL=jdbc:mysql://booknest-mysql:3306/booknest_book
+      - SPRING_REDIS_HOST=booknest-redis
+      - SPRING_ELASTICSEARCH_URIS=http://booknest-elasticsearch:9200
       - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
@@ -154,8 +146,8 @@ services:
     container_name: order-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_order
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=booknest-kafka:9092
+      - SPRING_DATASOURCE_URL=jdbc:mysql://booknest-mysql:3306/booknest_order
       - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
@@ -170,7 +162,7 @@ services:
     container_name: cart-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_cart
+      - SPRING_DATASOURCE_URL=jdbc:mysql://booknest-mysql:3306/booknest_cart
       - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
@@ -185,8 +177,8 @@ services:
     container_name: wallet-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_wallet
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=booknest-kafka:9092
+      - SPRING_DATASOURCE_URL=jdbc:mysql://booknest-mysql:3306/booknest_wallet
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
       - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
       - JAVA_OPTS=-Xms128m -Xmx256m
@@ -203,10 +195,10 @@ services:
     container_name: notification-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=booknest-kafka:9092
       - EMAIL_USERNAME=${EMAIL_USERNAME:-dummy}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy}
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_notification
+      - SPRING_DATASOURCE_URL=jdbc:mysql://booknest-mysql:3306/booknest_notification
       - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
@@ -221,7 +213,7 @@ services:
     container_name: review-service
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/booknest_review
+      - SPRING_DATASOURCE_URL=jdbc:mysql://booknest-mysql:3306/booknest_review
       - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
       - mysql
@@ -247,9 +239,12 @@ services:
     build: ../../booknest-frontend
     image: booknest-frontend:latest
     container_name: booknest-frontend
-    network_mode: host
+    ports:
+      - "80:80"
     depends_on:
       - api-gateway
+    networks:
+      - booknest-network
     restart: always
 
 networks:
