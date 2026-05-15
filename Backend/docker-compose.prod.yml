@@ -70,14 +70,16 @@ services:
   # MICROSERVICES (Using ECR Images)
   # ============================================================
   eureka-server:
-    image: ${ECR_REGISTRY}/booknest-eureka-server:latest
+    build: ./eureka-server
+    image: booknest-eureka-server:latest
     container_name: eureka-server
     ports:
       - "8761:8761"
     restart: always
 
   api-gateway:
-    image: ${ECR_REGISTRY}/booknest-api-gateway:latest
+    build: ./api-gateway
+    image: booknest-api-gateway:latest
     container_name: api-gateway
     ports:
       - "8080:8080"
@@ -89,7 +91,8 @@ services:
     restart: always
 
   auth-service:
-    image: ${ECR_REGISTRY}/booknest-auth-service:latest
+    build: ./auth-service
+    image: booknest-auth-service:latest
     container_name: auth-service
     ports:
       - "8081:8081"
@@ -105,7 +108,8 @@ services:
     restart: always
 
   book-service:
-    image: ${ECR_REGISTRY}/booknest-book-service:latest
+    build: ./book-service-1
+    image: booknest-book-service:latest
     container_name: book-service
     ports:
       - "8082:8082"
@@ -123,7 +127,8 @@ services:
     restart: always
 
   order-service:
-    image: ${ECR_REGISTRY}/booknest-order-service:latest
+    build: ./order-service
+    image: booknest-order-service:latest
     container_name: order-service
     ports:
       - "8084:8084"
@@ -135,8 +140,10 @@ services:
       - mysql
       - kafka
     restart: always
+
   cart-service:
-    image: ${ECR_REGISTRY}/booknest-cart-service:latest
+    build: ./cart-service
+    image: booknest-cart-service:latest
     container_name: cart-service
     ports:
       - "8083:8083"
@@ -149,7 +156,8 @@ services:
     restart: always
 
   wallet-service:
-    image: ${ECR_REGISTRY}/booknest-wallet-service:latest
+    build: ./wallet-service
+    image: booknest-wallet-service:latest
     container_name: wallet-service
     ports:
       - "8085:8085"
@@ -165,7 +173,8 @@ services:
     restart: always
 
   notification-service:
-    image: ${ECR_REGISTRY}/booknest-notification-service:latest
+    build: ./notification-service
+    image: booknest-notification-service:latest
     container_name: notification-service
     ports:
       - "8086:8086"
@@ -181,7 +190,8 @@ services:
     restart: always
 
   review-service:
-    image: ${ECR_REGISTRY}/booknest-review-service:latest
+    build: ./review-service
+    image: booknest-review-service:latest
     container_name: review-service
     ports:
       - "8087:8087"
@@ -194,7 +204,8 @@ services:
     restart: always
 
   admin-server:
-    image: ${ECR_REGISTRY}/booknest-admin-server:latest
+    build: ./admin-server
+    image: booknest-admin-server:latest
     container_name: admin-server
     ports:
       - "9090:9090"
@@ -206,7 +217,8 @@ services:
     restart: always
 
   frontend:
-    image: ${ECR_REGISTRY}/booknest-frontend:latest
+    build: ../../booknest-frontend
+    image: booknest-frontend:latest
     container_name: booknest-frontend
     ports:
       - "80:80"
