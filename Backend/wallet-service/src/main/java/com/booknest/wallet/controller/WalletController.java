@@ -44,17 +44,28 @@ public class WalletController {
         return ResponseEntity.ok(walletService.getTransactions(userId));
     }
 
-    // Deduct funds from a user's wallet for an order
+    @Value("${gateway.secret}")
+    private String gatewaySecret;
+
+    // Deduct funds from a user's wallet for an order (INTERNAL ONLY)
     @PostMapping("/{userId}/deduct")
-    public ResponseEntity<Void> deductMoney(@PathVariable Long userId, @RequestParam Double amount, @RequestParam(required = false) Long orderId) {
+    public ResponseEntity<Void> deductMoney(@RequestHeader("X-Gateway-Secret") String secret, @PathVariable Long userId, @RequestParam Double amount, @RequestParam(required = false) Long orderId) {
+        if (!gatewaySecret.equals(secret)) {
+            log.warn("Unauthorized attempt to deduct money from user: {}", userId);
+            return ResponseEntity.status(403).build();
+        }
         log.info("Deducting {} from wallet {} for order {}", amount, userId, orderId);
         walletService.deductMoney(userId, amount, orderId);
         return ResponseEntity.ok().build();
     }
 
-    // Refund funds back to a user's wallet
+    // Refund funds back to a user's wallet (INTERNAL ONLY)
     @PostMapping("/{userId}/add")
-    public ResponseEntity<Void> refundMoney(@PathVariable Long userId, @RequestParam Double amount, @RequestParam(required = false) Long orderId) {
+    public ResponseEntity<Void> refundMoney(@RequestHeader("X-Gateway-Secret") String secret, @PathVariable Long userId, @RequestParam Double amount, @RequestParam(required = false) Long orderId) {
+        if (!gatewaySecret.equals(secret)) {
+            log.warn("Unauthorized attempt to add money to user: {}", userId);
+            return ResponseEntity.status(403).build();
+        }
         log.info("Refunding {} to wallet {} for order {}", amount, userId, orderId);
         walletService.addMoney(userId, amount, orderId);
         return ResponseEntity.ok().build();

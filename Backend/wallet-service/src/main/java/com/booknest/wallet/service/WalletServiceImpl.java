@@ -96,7 +96,7 @@ public class WalletServiceImpl implements WalletService {
 
     // Verify the payment signature from Razorpay and credit the wallet accordingly
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void verifyPayment(PaymentVerifyRequest request) {
         log.info("Verifying Razorpay payment for user: {}", request.getUserId());
         try {
@@ -105,16 +105,21 @@ public class WalletServiceImpl implements WalletService {
             options.put("razorpay_payment_id", request.getRazorpayPaymentId());
             options.put("razorpay_signature", request.getRazorpaySignature());
 
+            // Verify signature
             Utils.verifyPaymentSignature(options, secret);
 
             if (request.getAmount() == null || request.getAmount() <= 0) {
-                throw new RuntimeException("Invalid payment amount.");
+                throw new RuntimeException("Invalid payment amount: " + request.getAmount());
             }
 
+            // Only add money IF verification passes
             addMoney(request.getUserId(), request.getAmount());
+            log.info("Payment verified and money added for user: {}", request.getUserId());
+            
         } catch (Exception e) {
-            log.error("Payment verification failed: {}", e.getMessage());
-            throw new RuntimeException("Payment verification failed.");
+            log.error("Payment verification failed for user {}: {}", request.getUserId(), e.getMessage());
+            // This throw triggers the Transactional rollback
+            throw new RuntimeException("Payment verification failed. No money was added.");
         }
     }
 
@@ -140,8 +145,25 @@ public class WalletServiceImpl implements WalletService {
         transactionRepository.save(txn);
     }
 
-    // Send an asynchronous wallet event notification
+    // Send an asynchronous wallet event notification ONLY after DB commit
     private void sendWalletEvent(Long userId, String type, String message) {
+        // ✅ NEW: Use TransactionSynchronization to ensure message is only sent 
+        // after the database transaction is successfully COMMITTED.
+        if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        executeSendEvent(userId, type, message);
+                    }
+                }
+            );
+        } else {
+            executeSendEvent(userId, type, message);
+        }
+    }
+
+    private void executeSendEvent(Long userId, String type, String message) {
         String email = "";
         String mobile = "";
 
