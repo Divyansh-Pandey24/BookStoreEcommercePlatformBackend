@@ -91,6 +91,17 @@ class WalletControllerTest {
     }
 
     @Test
+    @DisplayName("POST /wallet/{userId}/add: success → 200 OK")
+    void addMoney_success() throws Exception {
+        doNothing().when(walletService).addMoney(eq(10L), eq(100.0), isNull());
+
+        mockMvc.perform(post("/wallet/10/add")
+                        .header("X-Gateway-Secret", GATEWAY_SECRET)
+                        .param("amount", "100.0"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("POST /wallet/razorpay/create-order: success → 200 OK")
     void createOrder_success() throws Exception {
         RazorpayOrderResponse rResponse = new RazorpayOrderResponse("rzp_123", "key_456", 200.0, "INR");

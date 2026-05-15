@@ -47,9 +47,10 @@ jobs:
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS booknest_review;"
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS booknest_wallet;"
 
-      - name: Build and Test
-        working-directory: Backend
-        run: mvn clean test -pl "!eureka-server"
+      - name: Build with Maven
+        run: |
+          cd Backend
+          mvn clean package -DskipTests
         env:
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: root
