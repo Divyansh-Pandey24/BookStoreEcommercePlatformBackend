@@ -33,6 +33,9 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Install MySQL Client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+
       - name: Create Databases
         run: |
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS booknest_auth;"
@@ -50,6 +53,10 @@ jobs:
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: root
           SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+          SPRING_KAFKA_LISTENER_AUTO_STARTUP: "false"
+          EUREKA_CLIENT_ENABLED: "false"
+          SPRING_BOOT_ADMIN_CLIENT_ENABLED: "false"
+          SPRING_CLOUD_CONFIG_ENABLED: "false"
 
       - name: SonarQube Scan
         working-directory: Backend
