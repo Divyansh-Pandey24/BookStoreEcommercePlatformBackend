@@ -112,6 +112,8 @@ services:
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
       - JAVA_OPTS=-Xms128m -Xmx256m
+    volumes:
+      - book-images:/app/uploads
     depends_on:
       - mysql
       - eureka-server
@@ -212,3 +214,4 @@ volumes:
   mysql-data:
   redis-data:
   es-data:
+  book-images:
