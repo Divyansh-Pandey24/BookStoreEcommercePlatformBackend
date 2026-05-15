@@ -68,10 +68,11 @@ services:
     environment:
       - JAVA_OPTS=-Xms128m -Xmx256m
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8761/eureka/ || exit 1"]
-      interval: 15s
+      test: ["CMD-SHELL", "nc -z localhost 8761 || exit 1"]
+      interval: 20s
       timeout: 10s
-      retries: 5
+      retries: 10
+      start_period: 40s
     restart: always
 
   api-gateway:
