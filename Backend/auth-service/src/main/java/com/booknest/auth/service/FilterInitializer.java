@@ -16,9 +16,12 @@ import org.springframework.stereotype.Component;
  * Without step 2, existing users would be blocked from logging in after
  * a Redis flush (e.g., cache clear or first-time setup).
  */
+import org.springframework.context.annotation.Profile;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Profile("!test")
 public class FilterInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
