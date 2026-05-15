@@ -67,23 +67,25 @@ public class AuthController {
 
     // Initiate password reset flow
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         if (email == null || email.isBlank()) {
             throw new RuntimeException("Email is required");
         }
-        return passwordResetService.forgotPassword(email);
+        String msg = passwordResetService.forgotPassword(email);
+        return ResponseEntity.ok(Map.of("message", msg));
     }
 
     // Reset password using token
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> request) {
         String token = request.get("token");
         String newPassword = request.get("newPassword");
         if (token == null || token.isBlank() || newPassword == null || newPassword.isBlank()) {
             throw new RuntimeException("Token and new password are required");
         }
-        return passwordResetService.resetPassword(token, newPassword);
+        String msg = passwordResetService.resetPassword(token, newPassword);
+        return ResponseEntity.ok(Map.of("message", msg));
     }
 
     // Get user profile details by ID
