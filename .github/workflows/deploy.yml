@@ -34,6 +34,7 @@ jobs:
           cache: maven
 
       - name: Build and Test
+        working-directory: Backend
         run: mvn clean test -pl "!eureka-server"
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/booknest_db
@@ -42,6 +43,7 @@ jobs:
           SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
 
       - name: SonarQube Scan
+        working-directory: Backend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
