@@ -85,8 +85,7 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - JAVA_OPTS=-Xms128m -Xmx256m
     depends_on:
-      eureka-server:
-        condition: service_healthy
+      - eureka-server
     restart: always
 
   auth-service:
