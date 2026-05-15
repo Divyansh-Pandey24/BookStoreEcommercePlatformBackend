@@ -95,6 +95,16 @@ jobs:
               git clone https://x-access-token:${{ secrets.GH_PAT }}@github.com/Divyansh-Pandey24/BookStoreEcommercePlatform-Frontend.git booknest-frontend
             fi
 
+            # Add Swap file if not present (prevents OOM during build on small EC2s)
+            if [ ! -f "/swapfile" ]; then
+              echo "Creating 2G swap file..."
+              sudo fallocate -l 2G /swapfile
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+            fi
+
             # Ensure Java, Docker and Docker Compose are installed
             if ! command -v java &> /dev/null || ! command -v docker &> /dev/null; then
               echo "Installing dependencies..."
