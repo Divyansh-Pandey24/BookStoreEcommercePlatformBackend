@@ -247,12 +247,9 @@ services:
     build: ../../booknest-frontend
     image: booknest-frontend:latest
     container_name: booknest-frontend
-    ports:
-      - "80:80"
+    network_mode: host
     depends_on:
       - api-gateway
-    networks:
-      - booknest-network
     restart: always
 
 networks:
