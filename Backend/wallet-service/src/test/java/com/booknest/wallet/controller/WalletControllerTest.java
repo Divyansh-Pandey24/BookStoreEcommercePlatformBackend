@@ -46,8 +46,14 @@ class WalletControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(walletController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
+        
+        // Inject the secret key into the controller so it doesn't fail with NULL
+        org.springframework.test.util.ReflectionTestUtils.setField(walletController, "gatewaySecret", "test-secret");
+        
         sampleWallet = new WalletDto(10L, 500.0);
     }
+
+    private static final String GATEWAY_SECRET = "test-secret";
 
     @Test
     @DisplayName("GET /wallet: success → 200 OK")
@@ -66,6 +72,7 @@ class WalletControllerTest {
         doNothing().when(walletService).deductMoney(eq(10L), eq(50.0), isNull());
 
         mockMvc.perform(post("/wallet/10/deduct")
+                        .header("X-Gateway-Secret", GATEWAY_SECRET)
                         .param("amount", "50.0"))
                 .andExpect(status().isOk());
     }
@@ -77,6 +84,7 @@ class WalletControllerTest {
                 .when(walletService).deductMoney(eq(10L), eq(1000.0), isNull());
 
         mockMvc.perform(post("/wallet/10/deduct")
+                        .header("X-Gateway-Secret", GATEWAY_SECRET)
                         .param("amount", "1000.0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Insufficient balance in wallet"));
