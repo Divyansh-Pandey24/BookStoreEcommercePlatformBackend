@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Profile;
 @RequiredArgsConstructor
 @Slf4j
 @Profile("!test")
+// Trigger final deployment with optimized ES and Razorpay keys
 public class DataFixer implements CommandLineRunner {
 
     private final BookRepository bookRepository;
