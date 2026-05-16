@@ -60,12 +60,6 @@ jobs:
           SPRING_BOOT_ADMIN_CLIENT_ENABLED: "false"
           SPRING_CLOUD_CONFIG_ENABLED: "false"
 
-      - name: SonarQube Scan
-        working-directory: Backend
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
 
   deploy:
     needs: test-and-analyze
