@@ -46,7 +46,43 @@
         <spring-cloud.version>2023.0.1</spring-cloud.version>
         <lombok.version>1.18.38</lombok.version>
         <jacoco.version>0.8.11</jacoco.version>
+        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
         <cloudinary.version>1.38.0</cloudinary.version>
+
+        <!--
+            SonarQube Properties — ALL modules share this project key.
+            This is what makes all services appear as ONE project in SonarQube.
+        -->
+        <sonar.projectKey>booknest-backend</sonar.projectKey>
+        <sonar.projectName>BookNest Backend</sonar.projectName>
+        <sonar.organization>divyansh-pandey24</sonar.organization>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.build.directory}/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <!--
+            Exclude generated/boilerplate classes from coverage.
+            DTOs, Entities, Config, and the main Application class
+            don't contain logic worth testing — excluding them keeps
+            the coverage metric meaningful and achievable at 80%+.
+        -->
+        <sonar.exclusions>
+            **/dto/**,
+            **/entity/**,
+            **/model/**,
+            **/config/**,
+            **/*Application.java,
+            **/aspect/**
+        </sonar.exclusions>
+        <sonar.coverage.exclusions>
+            **/dto/**,
+            **/entity/**,
+            **/model/**,
+            **/config/**,
+            **/*Application.java,
+            **/aspect/**
+        </sonar.coverage.exclusions>
     </properties>
 
     <!--
@@ -157,6 +193,16 @@
                 </executions>
             </plugin>
 
+            <!--
+                SonarQube Scanner Plugin.
+                Run with: mvn sonar:sonar -Dsonar.token=YOUR_TOKEN
+                All modules are scanned as ONE project because they share
+                the same sonar.projectKey defined in <properties> above.
+            -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>${sonar-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
